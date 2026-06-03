@@ -190,15 +190,18 @@ export function KpiCard({
         ? "text-success"
         : "";
   return (
-    <div className="flex flex-col gap-2 p-5">
-      <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+    <div className="flex flex-col gap-1.5 p-4">
+      <div className="text-label">
         {label}
       </div>
-      <div className={`text-3xl font-semibold leading-none tabular-nums ${valueClass}`}>
+      <div
+        className={`text-[1.75rem] font-semibold leading-none tabular-nums tracking-[-0.02em] ${valueClass}`}
+        style={{ fontFamily: "var(--font-heading, var(--font-sans))" }}
+      >
         {value}
       </div>
       {hint != null && (
-        <div className="text-xs text-muted-foreground">{hint}</div>
+        <div className="text-[11px] text-muted-foreground mt-0.5">{hint}</div>
       )}
     </div>
   );
