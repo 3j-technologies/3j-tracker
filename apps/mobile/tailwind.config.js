@@ -50,10 +50,12 @@ module.exports = {
           foreground: "hsl(var(--card-foreground))",
         },
 
-        // Multica custom tokens
+        // 3J Tracker brand tokens — amber-orange
         brand: {
           DEFAULT: "hsl(var(--brand))",
           foreground: "hsl(var(--brand-foreground))",
+          hover: "hsl(var(--brand-hover))",
+          active: "hsl(var(--brand-active))",
         },
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",

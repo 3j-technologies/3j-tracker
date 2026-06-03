@@ -1,0 +1,34 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Flow: open the Kanban board from the More menu (Feature 3).
+# Pre-condition: user is logged in (may be anywhere in the workspace).
+
+# Go back to tab bar if on a detail screen
+- runFlow:
+    when:
+      notVisible: "Inbox"
+    commands:
+      - pressKey: Back
+      - waitForAnimationToEnd:
+          timeout: 2000
+
+# Open the More tab (triggers dropdown)
+- tapOn:
+    text: "More"
+
+# Wait for dropdown
+- waitForAnimationToEnd:
+    timeout: 3000
+
+# Board item must be in the dropdown
+- assertVisible: "Board"
+- tapOn: "Board"
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# Board screen must show the header and first two visible columns.
+# "In Progress" may be off-screen (horizontal scroll) depending on screen width.
+- assertVisible: "Board"
+- assertVisible: "Backlog"
+- assertVisible: "Todo"

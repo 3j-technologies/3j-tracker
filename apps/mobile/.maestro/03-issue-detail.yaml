@@ -1,0 +1,12 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Flow: open first issue in the list and view detail
+# Pre-condition: user is on the My Issues tab showing at least one issue.
+
+# Tap the first visible issue row (testID prefix "issue-row-")
+- tapOn:
+    id: "issue-row-.*"
+    index: 0
+
+# Issue detail screen — comment composer pill is the reliable sentinel
+- assertVisible: "Add a comment, @ to mention"

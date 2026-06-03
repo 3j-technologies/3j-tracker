@@ -1,0 +1,119 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Smoke E2E: login → issues list → open issue detail
+#
+# Run with:
+#   ~/.maestro/bin/maestro test apps/mobile/.maestro/e2e-smoke.yaml \
+#     -e APP_BUNDLE_ID=app.tracker.x3jtech.dev \
+#     -e TEST_EMAIL=test@3jtech.app \
+#     -e TEST_OTP=123456
+#
+# Requirements:
+#   - Android emulator running (Pixel_5 preferred)
+#   - Dev client APK installed, Metro running on port :8086 (NOT :8085 which
+#     is used by krisala-portal):
+#       cd apps/mobile && npx expo start --port 8086
+#       adb reverse tcp:8086 tcp:8086 && adb reverse tcp:8090 tcp:8090
+#   - FIRST RUN: manually connect the dev client to http://10.0.2.2:8086
+#     via "New development server" in the dev client home screen. On subsequent
+#     runs the server is cached and launches automatically.
+#   - Local backend on :8090 with MULTICA_DEV_VERIFICATION_CODE=123456
+#   - TEST_EMAIL account must belong to at least one workspace with issues
+
+# ── Launch ───────────────────────────────────────────────────────────────────
+- launchApp
+
+- waitForAnimationToEnd:
+    timeout: 8000
+
+# ── If dev client home screen: tap the "Recently Opened" Multica server ───────
+- runFlow:
+    when:
+      visible: "RECENTLY OPENED"
+    commands:
+      - tapOn:
+          text: ".*8086.*"
+      - waitForAnimationToEnd:
+          timeout: 30000
+
+# ── Dismiss developer menu if shown ──────────────────────────────────────────
+- runFlow:
+    when:
+      visible: "Continue"
+    commands:
+      - tapOn: "Continue"
+      - waitForAnimationToEnd:
+          timeout: 3000
+
+- runFlow:
+    when:
+      visible: "Toggle performance monitor"
+    commands:
+      - pressKey: Back
+      - waitForAnimationToEnd:
+          timeout: 2000
+
+# ── Handle runtime crash screens ─────────────────────────────────────────────
+# If a JS error dialog appears (Hermes error screen), reload to recover.
+# This should not happen after our expo-notifications graceful degradation,
+# but guards against unexpected failures.
+- runFlow:
+    when:
+      visible: "Uncaught Error"
+    commands:
+      - tapOn: "RELOAD"
+      - waitForAnimationToEnd:
+          timeout: 15000
+
+# ── Auth: login screen ───────────────────────────────────────────────────────
+# The app may already be on a workspace if previous session was active.
+# If login screen is showing, authenticate.
+- runFlow:
+    when:
+      visible: "Send code"
+    commands:
+      - tapOn:
+          text: "you@example.com"
+      - inputText: ${TEST_EMAIL}
+      - tapOn: "Send code"
+      - waitForAnimationToEnd:
+          timeout: 8000
+      - assertVisible: "Enter verification code"
+      - inputText: ${TEST_OTP}
+      - waitForAnimationToEnd:
+          timeout: 15000
+
+# ── Workspace selection (if shown) ───────────────────────────────────────────
+- runFlow:
+    when:
+      visible: "Select a workspace"
+    commands:
+      - tapOn: "3J Technologies"
+      - waitForAnimationToEnd:
+          timeout: 8000
+
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# ── My Issues list ───────────────────────────────────────────────────────────
+- tapOn:
+    text: "My Issues"
+
+# Wait for the My Issues screen to fully load (issues may need time to fetch)
+- waitForAnimationToEnd:
+    timeout: 8000
+
+- assertVisible: "Assigned"
+- assertVisible: "Created"
+- tapOn: "Created"
+
+# Wait for Created scope issues to load
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# ── Issue detail ─────────────────────────────────────────────────────────────
+- tapOn:
+    id: "issue-row-.*"
+    index: 0
+
+- assertVisible: "ACTIVITY"

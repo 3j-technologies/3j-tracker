@@ -1,0 +1,26 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Flow: verify push notification registration is attempted on login (Feature 4).
+# On Android emulator, expo-notifications may not obtain a real token
+# (FCM requires Play Services with a real Google account). The test
+# verifies the app works correctly even when push registration fails gracefully.
+#
+# Key assertion: the app DOES NOT CRASH when push setup is unavailable.
+# The "Uncaught Error" screen must not appear.
+#
+# For a real push delivery test, use the Expo push API directly.
+
+# Navigate to a tab (from wherever we are)
+- runFlow:
+    when:
+      notVisible: "My Issues"
+    commands:
+      - pressKey: Back
+      - waitForAnimationToEnd:
+          timeout: 2000
+
+# Verify My Issues tab is accessible (app is functioning normally)
+- assertVisible: "My Issues"
+
+# There should be no crash / white-screen from push registration failure.
+- assertNotVisible: "Uncaught Error"

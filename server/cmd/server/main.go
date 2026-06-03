@@ -272,6 +272,9 @@ func main() {
 	registerSubscriberListeners(bus, queries)
 	registerActivityListeners(bus, queries)
 	registerNotificationListeners(bus, queries)
+	// Mobile push notifications — best-effort side channel for key events.
+	// No-ops cleanly if device_push_token table is absent (unmigrated installs).
+	registerPushListeners(bus, pool, queries)
 
 	metricsConfig := obsmetrics.ConfigFromEnv()
 	var metricsServer *http.Server

@@ -17,6 +17,7 @@ import { ModalCloseButton } from "@/components/ui/modal-close-button";
 import { useNewIssueDraftResetOnWorkspaceChange } from "@/data/stores/new-issue-draft-store";
 import { useNewProjectDraftResetOnWorkspaceChange } from "@/data/stores/new-project-draft-store";
 import { useChatSessionPickerResetOnWorkspaceChange } from "@/data/stores/chat-session-picker-store";
+import { usePushNotifications } from "@/lib/use-push-notifications";
 
 /**
  * Shared Stack.Screen options for every iOS formSheet-presented sheet route.
@@ -85,6 +86,10 @@ function RealtimeSubscriptions() {
   // the deliberately-skipped high-frequency events.
   useWorkspacePresencePrefetch();
   usePresenceRealtime();
+  // Push notifications: register device token + handle notification tap
+  // deep-linking. Runs once per workspace session; no-ops gracefully on
+  // simulators without real push support.
+  usePushNotifications();
   return null;
 }
 
@@ -226,6 +231,12 @@ export default function WorkspaceLayout() {
           name="issue/[id]/comment/[commentId]/emoji-picker"
           options={SHEET_OPTIONS}
         />
+        {/* Full emoji picker for an issue-level reaction. Opened from the
+            "+" button in IssueReactionRow. */}
+        <Stack.Screen
+          name="issue/[id]/emoji-picker"
+          options={SHEET_OPTIONS}
+        />
         {/* Project-detail formSheet pickers. */}
         <Stack.Screen
           name="project/[id]/picker/status"
@@ -270,6 +281,14 @@ export default function WorkspaceLayout() {
         <Stack.Screen
           name="new-issue-picker/due-date"
           options={SHEET_OPTIONS}
+        />
+        <Stack.Screen
+          name="new-issue-picker/labels"
+          options={{
+            ...SHEET_OPTIONS,
+            headerShown: true,
+            title: "Labels",
+          }}
         />
         {/* New-project draft formSheet pickers — same pattern as
             new-issue-picker/*. Stacked on top of `project/new` (a modal). */}
@@ -316,6 +335,11 @@ export default function WorkspaceLayout() {
         <Stack.Screen
           name="more/settings/notifications"
           options={{ title: "Notifications", headerBackTitle: "Settings" }}
+        />
+        {/* Kanban board screen — pushed from the more menu. */}
+        <Stack.Screen
+          name="board"
+          options={{ title: "Board", headerBackTitle: "Back" }}
         />
         <Stack.Screen
           name="new-issue"

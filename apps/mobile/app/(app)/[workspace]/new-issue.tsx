@@ -31,11 +31,12 @@ import { MOBILE_PLACEHOLDER_COLOR } from "@/components/ui/input-tokens";
 import { useCreateIssue } from "@/data/mutations/issues";
 import { useNewIssueDraftStore } from "@/data/stores/new-issue-draft-store";
 import { useMentionInput } from "@/lib/use-mention-input";
+import { api } from "@/data/api";
 
 export default function NewIssueModal() {
   const [title, setTitle] = useState("");
   const description = useMentionInput();
-  // Attribute chips (status / priority / assignee / due date / project)
+  // Attribute chips (status / priority / assignee / due date / project / labels)
   // live in `useNewIssueDraftStore` so the new-issue-picker/* formSheet
   // routes can read and write the same values without a parent-child
   // React relationship. The store is reset on mount + on unmount so
@@ -45,6 +46,7 @@ export default function NewIssueModal() {
   const assignee = useNewIssueDraftStore((s) => s.assignee);
   const dueDate = useNewIssueDraftStore((s) => s.dueDate);
   const project = useNewIssueDraftStore((s) => s.project);
+  const labels = useNewIssueDraftStore((s) => s.labels);
   const resetDraft = useNewIssueDraftStore((s) => s.reset);
 
   useEffect(() => {
@@ -64,7 +66,7 @@ export default function NewIssueModal() {
     if (trimmedTitle.length === 0) return;
     const finalDescription = description.serialize().trim();
     try {
-      await createIssue.mutateAsync({
+      const issue = await createIssue.mutateAsync({
         title: trimmedTitle,
         description: finalDescription || undefined,
         status,
@@ -75,6 +77,15 @@ export default function NewIssueModal() {
         ...(dueDate ? { due_date: dueDate } : {}),
         ...(project ? { project_id: project.id } : {}),
       });
+      // Attach labels after issue creation (backend CreateIssueRequest has
+      // no label_ids field — labels are attached via separate API calls).
+      // Use api directly since useAttachLabel requires the issue id to be
+      // known at hook-call time (React rules).
+      if (labels.length > 0 && issue?.id) {
+        await Promise.allSettled(
+          labels.map((label) => api.attachLabel(issue.id, label.id)),
+        );
+      }
       router.back();
     } catch (err) {
       Alert.alert(
@@ -90,6 +101,7 @@ export default function NewIssueModal() {
     assignee,
     dueDate,
     project,
+    labels,
     createIssue,
   ]);
 

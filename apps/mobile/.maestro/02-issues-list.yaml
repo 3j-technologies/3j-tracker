@@ -1,0 +1,15 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Flow: authenticated user sees issues list
+# Pre-condition: app is launched and user is logged in (run 01-login first,
+# or use a persistent auth state).
+
+# Navigate to my-issues tab (bottom tab)
+- tapOn:
+    id: ".*"
+    text: "My Issues"
+    optional: false
+
+# My Issues tab must be visible with at least the scope selector
+- assertVisible: "Assigned"
+- assertVisible: "Created"

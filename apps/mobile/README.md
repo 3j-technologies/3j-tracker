@@ -1,104 +1,98 @@
-# Multica Mobile (iOS)
+# 3J Tracker Mobile (Android + iOS)
 
-Expo + React Native iOS client for Multica. Independent from web/desktop — shares only types from `@multica/core/`. See [`CLAUDE.md`](./CLAUDE.md) for the locked tech-stack baseline and import rules.
+Expo SDK 55 + React Native cross-platform client for 3J Tracker. Wires to `@multica/core` for types only — all API calls, state management, and UI are mobile-owned. Theme: "Print-Room Precision" amber-orange brand (h=38 HSL).
 
-## Just want to use it on your phone? (no development)
+## Screens
 
-Multica isn't on the App Store yet — until that changes, anyone who wants it on their iPhone builds from source. One command:
+| Screen | Route |
+|--------|-------|
+| Login | `/(auth)/login` |
+| OTP Verify | `/(auth)/verify` |
+| Workspace picker | `/(app)/select-workspace` |
+| Inbox | `/(app)/[workspace]/(tabs)/inbox` |
+| My Issues | `/(app)/[workspace]/(tabs)/my-issues` |
+| Issue detail | `/(app)/[workspace]/issue/[id]` |
+| Create issue | `/(app)/[workspace]/new-issue` |
+| Projects | `/(app)/[workspace]/more/projects` |
+| Chat | `/(app)/[workspace]/(tabs)/chat` |
+| More / Settings | `/(app)/[workspace]/(tabs)/more` |
 
-```bash
-pnpm ios:mobile:device:prod:release
-```
-
-This connects to the same backend as `multica.ai`, so your existing account just works.
-
-**Prerequisites**: Mac with Xcode, a free Apple ID added under Xcode → Settings → Accounts, iPhone connected via USB with [Developer Mode enabled](https://docs.expo.dev/guides/ios-developer-mode/). Walk through Expo's [Set up your environment](https://docs.expo.dev/get-started/set-up-your-environment/) (pick **Development build → iOS Device**) if any of that is missing.
-
-Xcode signs the build with the "Personal Team" your Apple ID automatically owns — created silently the first time you signed into Xcode, no setup needed. The first build downloads CocoaPods + compiles React Native from source — expect 10–20 minutes. Subsequent builds reuse Xcode's cache.
-
-**If Xcode rejects signing with "No matching provisioning profiles found"** — rare, happens if someone has claimed the default bundle id `ai.multica.mobile` on Apple's developer portal. Pick any reverse-domain you own and re-run:
-
-```bash
-export EXPO_BUNDLE_IDENTIFIER_PROD=com.yourname.multica
-pnpm ios:mobile:device:prod:release
-```
-
-**7-day signing limit**: a free Apple ID signs builds for 7 days. After that, plug back into the Mac and re-run the command to re-sign. An Apple Developer Program account ($99/yr) extends this to 1 year.
-
-Everything below is for app developers — you can ignore the rest if you only wanted a personal install.
-
-## Scripts
-
-| Command | What it does | Backend |
-|---|---|---|
-| `pnpm dev:mobile` | Metro only (reuse existing install) | local (`.env.development.local`) |
-| `pnpm dev:mobile:staging` | Metro only (reuse existing install) | staging (`.env.staging`) |
-| `pnpm dev:mobile:prod` | Metro only (reuse existing install) | production (`.env.production`) |
-| `pnpm ios:mobile` | Full rebuild + install on **iOS Simulator**, Debug | local |
-| `pnpm ios:mobile:staging` | Full rebuild + install on **iOS Simulator**, Debug | staging |
-| `pnpm ios:mobile:prod` | Full rebuild + install on **iOS Simulator**, Debug | production |
-| `pnpm ios:mobile:device` | Full rebuild + install on **USB iPhone**, Debug | local |
-| `pnpm ios:mobile:device:staging` | Full rebuild + install on **USB iPhone**, Debug | staging |
-| `pnpm ios:mobile:device:staging:release` | Full rebuild + install on **USB iPhone**, Release (standalone) | staging |
-| `pnpm ios:mobile:device:prod` | Full rebuild + install on **USB iPhone**, Debug | production |
-| `pnpm ios:mobile:device:prod:release` | Full rebuild + install on **USB iPhone**, Release (standalone) | production |
-
-`dev:*` runs Metro only — assumes the matching variant is already installed. `ios:mobile*` does a full native rebuild + install.
-
-Bundle id and display name switch on `APP_ENV` (see `app.config.ts`), so Dev / Staging / Production variants can coexist on the same device or simulator.
-
-## First-time setup
-
-`.env.staging` is committed (public staging URL). `.env.development.local` is gitignored — copy the template once:
+## Quick start (Android emulator)
 
 ```bash
+# 1. Install dependencies from repo root
+export PNPM_STORE_DIR=/Users/mohitshinde/Library/pnpm/store
+pnpm install
+
+# 2. Set env (live backend)
 cp apps/mobile/.env.example apps/mobile/.env.development.local
-# then edit EXPO_PUBLIC_API_URL inside it to your Mac's LAN IP, e.g. http://192.168.1.42:8080
+# Edit EXPO_PUBLIC_API_URL=https://tracker.3jtech.app
+
+# 3. Start Android emulator (Pixel_5 AVD)
+~/Library/Android/sdk/emulator/emulator -avd Pixel_5_clone1 -no-window -no-audio &
+
+# 4. Build + install dev client
+export CMAKE_VERSION=3.18.1  # required — cmake 3.22 has ninja bug on macOS
+cd apps/mobile && pnpm android
+
+# 5. Set reverse ports (emulator → host)
+adb reverse tcp:8085 tcp:8085
+
+# 6. Start Metro on dedicated port
+pnpm dev --port 8085
+# In the dev client, tap http://10.0.2.2:8085
 ```
 
-If your Apple ID isn't on the Multica Apple Developer team yet, also uncomment and set `EXPO_BUNDLE_IDENTIFIER_DEV` to a reverse-domain you own (e.g. `com.yourname.multica.dev`). This **only** overrides the dev variant — staging / production bundle ids are intentionally not overridable so variants can coexist.
-
-## Build it onto your iPhone
-
-Two paths, depending on what you want to do:
-
-### Day-to-day development (Mac in front of you)
+## Quick start (iOS simulator)
 
 ```bash
-pnpm ios:mobile:device:staging
+cd apps/mobile && pnpm ios
 ```
 
-Produces a **Debug build** with `expo-dev-launcher` embedded. Every launch the app probes Metro on your Mac and pulls fresh JS — perfect for hot-reload, painful when the Mac is asleep or you're on a different WiFi.
+## Environment variables
 
-### Standalone / "just use it" (walk away from the Mac)
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `EXPO_PUBLIC_API_URL` | Yes | Tracker backend base URL. Use `https://tracker.3jtech.app` for live, `http://10.0.2.2:8090` for local backend on Android emulator. |
+
+See `.env.example` for a full annotated template.
+
+## E2E tests (Maestro)
+
+Flows are in `.maestro/`. The smoke flow covers: launch → login → verify OTP → workspace → issues list → issue detail.
 
 ```bash
-pnpm ios:mobile:device:staging:release
+# Run smoke test against local backend with dev OTP
+~/.maestro/bin/maestro test apps/mobile/.maestro/e2e-smoke.yaml \
+  -e APP_BUNDLE_ID=app.tracker.x3jtech.dev \
+  -e TEST_EMAIL=test@3jtech.app \
+  -e TEST_OTP=123456
 ```
 
-Produces a **Release build**. No `expo-dev-launcher`, no Metro probe, no "Downloading…" screen. Splash → app, exactly like an App Store install. Trade-off: every JS change requires re-running this command.
+**Local backend setup for E2E:**
+```bash
+cd server
+DATABASE_URL=... PORT=8090 TRACKER_DEV_VERIFICATION_CODE=123456 APP_ENV=development \
+  go run cmd/server/main.go cmd/server/router.go ... &
+adb reverse tcp:8090 tcp:8090
+```
 
-Both paths share the same prerequisites: Mac with Xcode, free Apple ID added under Xcode → Settings → Accounts, iPhone connected via USB with Developer Mode enabled. Follow Expo's [Set up your environment](https://docs.expo.dev/get-started/set-up-your-environment/) — pick **Development build → iOS Device** — if any of that is missing.
+## Tech stack
 
-First build of either variant downloads CocoaPods + compiles React Native from source — expect 10-20 minutes. Subsequent builds reuse Xcode's DerivedData cache.
+- **Expo SDK 55** + **Expo Router** (file-based navigation)
+- **React Native 0.83** + **NativeWind 4** (Tailwind v3 in RN)
+- **Zustand** (auth + workspace + view stores)
+- **TanStack Query v5** (server state, optimistic updates)
+- **expo-secure-store** (token storage, mobile-only)
+- **@multica/core** (types only — zero runtime coupling)
 
-## Try it in the iOS Simulator (no iPhone needed)
+## cmake note (Android builds on macOS)
+
+cmake 3.22.1 (bundled with Android SDK) has a ninja target-detection bug on macOS ARM64 that breaks `react-native-reanimated`. Fix:
 
 ```bash
-pnpm ios:mobile:staging
+~/Library/Android/sdk/cmdline-tools/latest/bin/sdkmanager "cmake;3.18.1"
+export CMAKE_VERSION=3.18.1
 ```
 
-Boots the simulator, builds, installs the dev-client. Faster to iterate than a device build because no signing / provisioning step. Same `dev:mobile:staging` Metro flow afterward.
-
-## 7-day signing limit (device only)
-
-A free Apple ID signs builds for **7 days only**, Debug and Release both. After that the app refuses to launch on the iPhone. Plug back into the Mac and re-run the corresponding `ios:mobile:device*` script to re-sign. Simulator builds are unaffected. The only workaround for the device limit is an Apple Developer Program account ($99/yr), which extends to 1 year.
-
-## Pointing at a different backend
-
-Edit `EXPO_PUBLIC_API_URL` in `.env.staging`, `.env.production`, or `.env.development.local` (whichever variant you're running). Then:
-
-- For an installed **Debug build**: restart Metro (`pnpm dev:mobile:staging`) so the next JS bundle picks up the new value.
-- For an installed **Release build**: re-run the `ios:mobile:device:staging:release` command — the value is baked into the embedded bundle at build time.
-
-For local backend testing, use your Mac's LAN IP (`ipconfig getifaddr en0`), not `localhost`.
+This is already documented in `android/local.properties`.

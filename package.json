@@ -46,5 +46,10 @@
     "pg": "^8.20.0",
     "turbo": "^2.5.4",
     "typescript": "catalog:"
+  },
+  "dependencies": {
+    "expo-device": "~55.0.17",
+    "expo-notifications": "~55.0.23",
+    "expo-splash-screen": "^55.0.7"
   }
 }

@@ -1,0 +1,28 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Flow: verify AI quick-actions "AI" button is visible on issue detail (Feature 2).
+# Pre-condition: user is logged in (may be anywhere in the workspace).
+
+# Navigate to an issue if we're not on the detail screen
+- runFlow:
+    when:
+      notVisible: "ACTIVITY"
+    commands:
+      # Go back to tab bar
+      - pressKey: Back
+      - waitForAnimationToEnd:
+          timeout: 2000
+      - tapOn: "My Issues"
+      - waitForAnimationToEnd:
+          timeout: 5000
+      - tapOn:
+          id: "issue-row-.*"
+          index: 0
+      - waitForAnimationToEnd:
+          timeout: 5000
+
+# Issue detail must show ACTIVITY section
+- assertVisible: "ACTIVITY"
+
+# AI quick-actions toggle must be visible
+- assertVisible: "AI"

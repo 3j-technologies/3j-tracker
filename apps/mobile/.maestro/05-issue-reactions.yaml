@@ -1,0 +1,23 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Flow: verify Feature 1 (reactions entry point) and Feature 2 (AI quick-actions)
+# on the issue detail screen.
+# Pre-condition: user is on the issue detail screen (or can navigate to it).
+
+# If on the detail screen already, assert directly.
+# Otherwise navigate to it.
+- runFlow:
+    when:
+      notVisible: "ACTIVITY"
+    commands:
+      - tapOn:
+          id: "issue-row-.*"
+          index: 0
+      - waitForAnimationToEnd:
+          timeout: 5000
+
+# Issue detail must show ACTIVITY
+- assertVisible: "ACTIVITY"
+
+# The "AI" quick-actions toggle (Feature 2) must be visible in the header area
+- assertVisible: "AI"

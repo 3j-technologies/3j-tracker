@@ -17,35 +17,41 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     name: isProd
-      ? "Multica"
+      ? "3J Tracker"
       : isStaging
-        ? "Multica (Staging)"
-        : "Multica (Dev)",
-    slug: "multica-mobile",
+        ? "3J Tracker (Staging)"
+        : "3J Tracker (Dev)",
+    slug: "3j-tracker-mobile",
     version: "0.1.0",
     orientation: "portrait",
     userInterfaceStyle: "automatic",
-    scheme: "multica",
+    scheme: "3jtracker",
     // 1024x1024 source shared with the desktop client
     // (apps/desktop/build/icon.png). Expo prebuild generates every required
     // iOS icon size from this single PNG.
     icon: "./assets/icon.png",
     ios: {
       supportsTablet: false,
-      // Per-variant bundle id overrides exist for one reason: an Apple ID
-      // can only sign bundle prefixes it owns, so contributors not on the
-      // Multica Apple Developer team (and external users self-building a
-      // personal copy against production) need to swap to a reverse-domain
-      // they control. Each variant has its own `_<VARIANT>` suffix and is
-      // only read inside that variant's branch — a generic
-      // `EXPO_BUNDLE_IDENTIFIER` would leak across variants (Expo CLI
-      // auto-loads `.env.<mode>.local` regardless of APP_ENV) and collapse
-      // dev / staging / prod onto a single id.
       bundleIdentifier: isProd
-        ? (process.env.EXPO_BUNDLE_IDENTIFIER_PROD ?? "ai.multica.mobile")
+        ? (process.env.EXPO_BUNDLE_IDENTIFIER_PROD ?? "app.3jtech.tracker")
         : isStaging
-          ? "ai.multica.mobile.staging"
-          : (process.env.EXPO_BUNDLE_IDENTIFIER_DEV ?? "ai.multica.mobile.dev"),
+          ? "app.3jtech.tracker.staging"
+          : (process.env.EXPO_BUNDLE_IDENTIFIER_DEV ?? "app.3jtech.tracker.dev"),
+    },
+    android: {
+      package: isProd
+        ? (process.env.EXPO_ANDROID_PACKAGE_PROD ?? "app.tracker.x3jtech")
+        : isStaging
+          ? "app.tracker.x3jtech.staging"
+          : (process.env.EXPO_ANDROID_PACKAGE_DEV ?? "app.tracker.x3jtech.dev"),
+      adaptiveIcon: {
+        foregroundImage: "./assets/icon.png",
+        backgroundColor: "#f5a623",
+      },
+      // RECORD_AUDIO is required for voice-note recording (expo-av).
+      // Declaring it here ensures every `expo prebuild` generates it in
+      // AndroidManifest.xml durably — no manual manifest editing needed.
+      permissions: ["android.permission.RECORD_AUDIO"],
     },
     plugins: [
       "expo-router",
@@ -57,12 +63,38 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           // iOS NSPhotoLibraryUsageDescription. Without this string in
           // Info.plist, calling launchImageLibraryAsync hard-crashes on
-          // iOS 14+. Camera + microphone are disabled — we only ever read
-          // from the existing photo library.
+          // iOS 14+. Camera is disabled — we only ever read from the
+          // existing photo library.
+          //
+          // NOTE: microphonePermission is intentionally NOT set to false
+          // here. Setting it to false causes expo-image-picker to emit
+          // tools:node="remove" for RECORD_AUDIO in AndroidManifest.xml,
+          // which blocks expo-av from recording voice notes (the manifest
+          // merge "remove" directive wins over any "add"). Omitting the
+          // option leaves RECORD_AUDIO to expo-av's config plugin
+          // (android.permissions below is belt-and-suspenders).
           photosPermission:
-            "Allow Multica to access your photos to attach images to issues and comments.",
+            "Allow 3J Tracker to access your photos to attach images to issues and comments.",
           cameraPermission: false,
-          microphonePermission: false,
+        },
+      ],
+      [
+        "expo-av",
+        {
+          // iOS NSMicrophoneUsageDescription — required for audio recording.
+          microphonePermission:
+            "Allow Multica to record voice notes to attach to issues.",
+        },
+      ],
+      [
+        "expo-notifications",
+        {
+          // Android notification channel / icon colour. iOS permissions
+          // are requested at runtime via the hook.
+          icon: "./assets/icon.png",
+          color: "#f5a623",
+          defaultChannel: "tracker-notifications",
+          sounds: [],
         },
       ],
       [
@@ -74,6 +106,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
     ],
-    extra: { APP_ENV: env },
+    extra: {
+      APP_ENV: env,
+      // TODO(infra/Mohit): run `eas init` (needs Expo account login) and wire
+      // the resulting projectId here so Expo push tokens resolve correctly on
+      // real devices:
+      //
+      //   eas: { projectId: "<uuid-from-eas-init>" },
+      //
+      // Until this is done, push-token acquisition will fail silently on device.
+    },
   };
 };

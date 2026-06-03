@@ -340,6 +340,9 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 		r.Post("/api/cli-token", h.IssueCliToken)
 		r.Post("/api/upload-file", h.UploadFile)
 		r.Post("/api/feedback", h.CreateFeedback)
+		// Mobile push token registration (Expo push notifications).
+		r.Put("/api/me/push-token", h.UpsertPushToken)
+		r.Delete("/api/me/push-token/{deviceId}", h.DeletePushToken)
 
 		r.Route("/api/workspaces", func(r chi.Router) {
 			r.Get("/", h.ListWorkspaces)
@@ -478,6 +481,10 @@ func NewRouterWithOptions(pool *pgxpool.Pool, hub *realtime.Hub, bus *events.Bus
 					r.Put("/metadata/{key}", h.SetIssueMetadataKey)
 					r.Delete("/metadata/{key}", h.DeleteIssueMetadataKey)
 					r.Get("/pull-requests", h.ListPullRequestsForIssue)
+					// AI quick-action: summarise issue + recent comments.
+					// POST /api/issues/{id}/summarize → { "summary": "..." }
+					// Returns 503 if OPENAI_API_KEY is not configured.
+					r.Post("/summarize", h.SummarizeIssue)
 				})
 			})
 

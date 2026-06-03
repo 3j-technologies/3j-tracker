@@ -40,7 +40,11 @@ interface Props {
 
 export function IssueRow({ issue, onPress, showStatus = false }: Props) {
   return (
-    <Pressable onPress={onPress} className="active:bg-secondary px-4 py-3">
+    <Pressable
+      onPress={onPress}
+      testID={`issue-row-${issue.id}`}
+      className="active:bg-secondary px-4 py-3"
+    >
       <View className="flex-row items-center gap-3">
         {showStatus ? <StatusIcon status={issue.status} size={14} /> : null}
         <PriorityIcon priority={issue.priority} size={14} />

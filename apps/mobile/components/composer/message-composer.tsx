@@ -64,6 +64,7 @@ import {
   type ComposerAttachmentItem,
   type MentionChip,
 } from "@/components/issue/composer-attachment-row";
+import { VoiceNoteRecorder } from "@/components/issue/voice-note-recorder";
 
 export interface MessageComposerReplyTarget {
   actorName: string;
@@ -572,6 +573,30 @@ export function MessageComposer({
             accessibilityLabel="Upload file"
             className="h-8 w-8"
           />
+          {uploadContext?.issueId && (
+            <VoiceNoteRecorder
+              uploadContext={uploadContext}
+              size={20}
+              onAttached={(attachmentId) => {
+                // Add the voice note as a completed attachment so
+                // the submit picks it up in activeIds.
+                const localId = `voice-${Date.now()}`;
+                setAttachments((prev) => [
+                  ...prev,
+                  {
+                    localId,
+                    localUri: "",
+                    filename: "Voice note",
+                    mimeType: "audio/m4a",
+                    status: "completed" as const,
+                    id: attachmentId,
+                    url: "",
+                    downloadUrl: "",
+                  },
+                ]);
+              }}
+            />
+          )}
           <View className="flex-1" />
           {isSending && renderStop ? (
             renderStop()
