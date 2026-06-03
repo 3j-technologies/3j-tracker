@@ -68,6 +68,25 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
       [
+        "expo-av",
+        {
+          // iOS NSMicrophoneUsageDescription — required for audio recording.
+          microphonePermission:
+            "Allow Multica to record voice notes to attach to issues.",
+        },
+      ],
+      [
+        "expo-notifications",
+        {
+          // Android notification channel / icon colour. iOS permissions
+          // are requested at runtime via the hook.
+          icon: "./assets/icon.png",
+          color: "#f5a623",
+          defaultChannel: "tracker-notifications",
+          sounds: [],
+        },
+      ],
+      [
         "expo-build-properties",
         {
           ios: {

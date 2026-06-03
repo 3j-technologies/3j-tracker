@@ -859,6 +859,53 @@ class ApiClient {
     );
   }
 
+  /**
+   * AI quick-action: summarise the issue + recent comments via the server's
+   * configured LLM provider (POST /api/issues/{id}/summarize).
+   * Returns a short plain-text summary.
+   * Throws ApiError with status 503 if the server has no AI provider.
+   */
+  async summarizeIssue(issueId: string): Promise<string> {
+    const raw = await this.fetch<unknown>(
+      `/api/issues/${issueId}/summarize`,
+      { method: "POST" },
+    );
+    if (
+      raw != null &&
+      typeof raw === "object" &&
+      "summary" in raw &&
+      typeof (raw as Record<string, unknown>).summary === "string"
+    ) {
+      return (raw as { summary: string }).summary;
+    }
+    return "";
+  }
+
+  /**
+   * Register or update a device push token for Expo push notifications.
+   * PUT /api/me/push-token
+   */
+  async upsertPushToken(payload: {
+    device_id: string;
+    token: string;
+    platform: "ios" | "android" | "";
+  }): Promise<void> {
+    await this.fetch<unknown>("/api/me/push-token", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    });
+  }
+
+  /**
+   * Remove a device push token (call on logout or when permission revoked).
+   * DELETE /api/me/push-token/:deviceId
+   */
+  async deletePushToken(deviceId: string): Promise<void> {
+    await this.fetch<unknown>(`/api/me/push-token/${deviceId}`, {
+      method: "DELETE",
+    });
+  }
+
   // --- Projects ---
   async listProjects(opts?: {
     signal?: AbortSignal;
