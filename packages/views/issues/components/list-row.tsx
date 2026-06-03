@@ -74,8 +74,8 @@ function ListRowContent({
         ref={containerRef}
         style={containerStyle}
         {...containerProps}
-        className={`group/row flex h-9 items-center gap-2 px-4 text-sm transition-colors hover:not-data-[popup-open]:bg-accent/60 data-[popup-open]:bg-accent ${
-          selected ? "bg-accent/30" : ""
+        className={`group/row flex h-8 items-center gap-2 px-3 text-[0.8125rem] transition-colors duration-100 hover:not-data-[popup-open]:bg-accent/50 data-[popup-open]:bg-accent ${
+          selected ? "bg-accent/40" : ""
         } ${isDragging ? "opacity-30" : ""}`}
       >
         <div
@@ -99,7 +99,10 @@ function ListRowContent({
           href={p.issueDetail(issue.id)}
           className={`flex flex-1 items-center gap-2 min-w-0 ${isDragging ? "pointer-events-none" : ""}`}
         >
-          <span className="w-16 shrink-0 text-xs text-muted-foreground">
+          <span
+            className="w-[60px] shrink-0 text-[11px] text-muted-foreground font-mono tracking-wide tabular-nums"
+            data-identifier
+          >
             {issue.identifier}
           </span>
           <IssueAgentActivityIndicator issueId={issue.id} />

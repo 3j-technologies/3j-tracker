@@ -181,18 +181,21 @@ export const BoardCardContent = memo(function BoardCardContent({
   const showRightMeta = !!showStartDate || !!showDueDate || !!showChildProgress || showUpdatedHint;
 
   return (
-    <div className="rounded-lg border-[0.5px] border-border bg-card py-3 px-2.5 shadow-[0_3px_6px_-2px_rgba(0,0,0,0.02),0_1px_1px_0_rgba(0,0,0,0.04)] transition-colors group-hover/card:border-accent group-hover/card:bg-accent group-data-[popup-open]/card:border-accent group-data-[popup-open]/card:bg-accent">
-      {/* Row 1: priority + identifier (left), agent activity + assignee (right) */}
+    <div className="rounded-[3px] border border-border bg-card py-2.5 px-2.5 shadow-[0_1px_3px_oklch(0_0_0/0.06)] transition-all duration-100 group-hover/card:border-ring/40 group-hover/card:bg-accent/30 group-data-[popup-open]/card:border-ring/40 group-data-[popup-open]/card:bg-accent/30">
+      {/* Row 1: priority + identifier (left), agent activity (right) */}
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 min-w-0">
+        <div className="flex items-center gap-1 min-w-0">
           {priorityIconNode}
-          <p className="text-xs text-muted-foreground truncate">{issue.identifier}</p>
+          <span
+            className="text-[11px] text-muted-foreground font-mono tracking-wide tabular-nums"
+            data-identifier
+          >{issue.identifier}</span>
         </div>
         <IssueAgentActivityIndicator issueId={issue.id} />
       </div>
 
-      {/* Row 2: Title */}
-      <p className="mt-1 text-sm font-medium leading-snug line-clamp-2">
+      {/* Row 2: Title — slightly tighter, Barlow medium at 13px */}
+      <p className="mt-1.5 text-[0.8125rem] font-medium leading-[1.35] line-clamp-2">
         {issue.title}
       </p>
 
@@ -200,17 +203,17 @@ export const BoardCardContent = memo(function BoardCardContent({
         const preview = descriptionPreview(issue.description!);
         if (!preview) return null;
         return (
-          <p className="mt-1 text-xs text-muted-foreground line-clamp-1">
+          <p className="mt-1 text-[11px] text-muted-foreground line-clamp-1 leading-relaxed">
             {preview}
           </p>
         );
       })()}
 
-      {/* Chip row: project + labels */}
+      {/* Chip row: project + labels — squared chips, not pills */}
       {(showProject || showLabels) && (
-        <div className="mt-1.5 flex items-center gap-1.5 flex-wrap">
+        <div className="mt-2 flex items-center gap-1 flex-wrap">
           {showProject && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-1.5 py-0.5 text-[11px] text-muted-foreground max-w-[160px]">
+            <span className="inline-flex items-center gap-1 rounded-[2px] bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground max-w-[140px]">
               <ProjectIcon project={project} size="sm" />
               <span className="truncate">{project!.title}</span>
             </span>

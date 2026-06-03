@@ -16,30 +16,31 @@
     color-scheme: light;
 }
 .landing-light {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.141 0.005 285.823);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.141 0.005 285.823);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.141 0.005 285.823);
-    --primary: oklch(0.21 0.006 285.885);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.967 0.001 286.375);
-    --secondary-foreground: oklch(0.21 0.006 285.885);
-    --muted: oklch(0.967 0.001 286.375);
-    --muted-foreground: oklch(0.552 0.016 285.938);
-    --accent: oklch(0.967 0.001 286.375);
-    --accent-foreground: oklch(0.21 0.006 285.885);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.92 0.004 286.32);
-    --input: oklch(0.92 0.004 286.32);
-    --ring: oklch(0.705 0.015 286.067);
-    --brand: oklch(0.55 0.16 255);
+    /* Mirror the :root palette from tokens.css — updated for the new amber brand */
+    --background: oklch(0.985 0.004 70);
+    --foreground: oklch(0.14 0.012 52);
+    --card: oklch(1 0.002 70);
+    --card-foreground: oklch(0.14 0.012 52);
+    --popover: oklch(1 0.002 70);
+    --popover-foreground: oklch(0.14 0.012 52);
+    --primary: oklch(0.20 0.018 52);
+    --primary-foreground: oklch(0.985 0.004 70);
+    --secondary: oklch(0.94 0.008 60);
+    --secondary-foreground: oklch(0.20 0.018 52);
+    --muted: oklch(0.94 0.006 62);
+    --muted-foreground: oklch(0.50 0.016 55);
+    --accent: oklch(0.92 0.010 58);
+    --accent-foreground: oklch(0.20 0.018 52);
+    --destructive: oklch(0.55 0.22 27);
+    --border: oklch(0.88 0.010 60);
+    --input: oklch(0.88 0.010 60);
+    --ring: oklch(0.72 0.18 48);
+    --brand: oklch(0.72 0.18 48);
     --brand-foreground: oklch(0.985 0 0);
-    --success: oklch(0.55 0.16 145);
-    --warning: oklch(0.75 0.16 85);
-    --info: oklch(0.55 0.18 250);
-    --scrollbar-thumb: oklch(0 0 0 / 10%);
-    --scrollbar-thumb-hover: oklch(0 0 0 / 18%);
+    --success: oklch(0.52 0.15 152);
+    --warning: oklch(0.72 0.18 82);
+    --info: oklch(0.52 0.18 245);
+    --scrollbar-thumb: oklch(0 0 0 / 12%);
+    --scrollbar-thumb-hover: oklch(0 0 0 / 20%);
     --scrollbar-track: transparent;
 }
