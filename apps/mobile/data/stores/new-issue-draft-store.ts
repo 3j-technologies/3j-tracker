@@ -25,6 +25,7 @@ import { create } from "zustand";
 import type {
   IssuePriority,
   IssueStatus,
+  Label,
   Project,
 } from "@multica/core/types";
 import type { AssigneeValue } from "@/components/issue/pickers/assignee-picker-body";
@@ -35,23 +36,27 @@ interface NewIssueDraftState {
   assignee: AssigneeValue;
   dueDate: string | null;
   project: Project | null;
+  /** Labels to attach immediately after issue creation. */
+  labels: Label[];
   setStatus: (next: IssueStatus) => void;
   setPriority: (next: IssuePriority) => void;
   setAssignee: (next: AssigneeValue) => void;
   setDueDate: (next: string | null) => void;
   setProject: (next: Project | null) => void;
+  setLabels: (next: Label[]) => void;
   reset: () => void;
 }
 
 const INITIAL: Pick<
   NewIssueDraftState,
-  "status" | "priority" | "assignee" | "dueDate" | "project"
+  "status" | "priority" | "assignee" | "dueDate" | "project" | "labels"
 > = {
   status: "todo",
   priority: "none",
   assignee: null,
   dueDate: null,
   project: null,
+  labels: [],
 };
 
 export const useNewIssueDraftStore = create<NewIssueDraftState>((set) => ({
@@ -61,6 +66,7 @@ export const useNewIssueDraftStore = create<NewIssueDraftState>((set) => ({
   setAssignee: (next) => set({ assignee: next }),
   setDueDate: (next) => set({ dueDate: next }),
   setProject: (next) => set({ project: next }),
+  setLabels: (next) => set({ labels: next }),
   reset: () => set({ ...INITIAL }),
 }));
 

@@ -42,9 +42,8 @@ export function IssueRow({ issue, onPress, showStatus = false }: Props) {
   return (
     <Pressable
       onPress={onPress}
+      testID={`issue-row-${issue.id}`}
       className="active:bg-secondary px-4 py-3"
-      testID={`issue-row-${issue.identifier}`}
-      accessibilityLabel={issue.title}
     >
       <View className="flex-row items-center gap-3">
         {showStatus ? <StatusIcon status={issue.status} size={14} /> : null}

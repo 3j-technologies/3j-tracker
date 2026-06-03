@@ -33,7 +33,8 @@ type NewIssuePickerField =
   | "priority"
   | "assignee"
   | "project"
-  | "due-date";
+  | "due-date"
+  | "labels";
 
 const NEW_ISSUE_PICKER_PATHNAMES = {
   status: "/[workspace]/new-issue-picker/status",
@@ -41,6 +42,7 @@ const NEW_ISSUE_PICKER_PATHNAMES = {
   assignee: "/[workspace]/new-issue-picker/assignee",
   project: "/[workspace]/new-issue-picker/project",
   "due-date": "/[workspace]/new-issue-picker/due-date",
+  labels: "/[workspace]/new-issue-picker/labels",
 } as const satisfies Record<NewIssuePickerField, string>;
 
 export function CreateFormAttributeRow() {
@@ -50,6 +52,7 @@ export function CreateFormAttributeRow() {
   const assignee = useNewIssueDraftStore((s) => s.assignee);
   const dueDate = useNewIssueDraftStore((s) => s.dueDate);
   const project = useNewIssueDraftStore((s) => s.project);
+  const labels = useNewIssueDraftStore((s) => s.labels);
 
   const { getName } = useActorLookup();
   const assigneeLabel = assignee
@@ -57,6 +60,13 @@ export function CreateFormAttributeRow() {
     : "Assignee";
   const priorityLabel =
     priority === "none" ? "Priority" : PRIORITY_LABEL[priority];
+
+  const labelsLabel =
+    labels.length === 0
+      ? "Labels"
+      : labels.length === 1
+        ? (labels[0]?.name ?? "Labels")
+        : `${labels.length} labels`;
 
   const open = (field: NewIssuePickerField) => {
     if (!wsSlug) return;
@@ -125,6 +135,18 @@ export function CreateFormAttributeRow() {
           label={project?.title ?? "Project"}
           variant={project ? "filled" : "dimmed"}
           onPress={() => open("project")}
+        />
+        <AttributeChip
+          icon={
+            <Ionicons
+              name="pricetag-outline"
+              size={14}
+              color={labels.length > 0 ? undefined : "#a1a1aa"}
+            />
+          }
+          label={labelsLabel}
+          variant={labels.length > 0 ? "filled" : "dimmed"}
+          onPress={() => open("labels")}
         />
       </View>
     </View>

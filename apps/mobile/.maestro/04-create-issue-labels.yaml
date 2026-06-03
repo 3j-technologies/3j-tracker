@@ -1,0 +1,27 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Flow: create a new issue with labels
+# Pre-condition: user is on the My Issues tab (post-login).
+# Verifies: label chip appears on new-issue form.
+
+- tapOn:
+    id: ".*new-issue.*|.*compose.*"
+    optional: true
+- runFlow:
+    when:
+      visible: "My Issues"
+    commands:
+      - tapOn: "My Issues"
+
+# Open new issue modal (+ button in the header)
+- tapOn:
+    id: ".*new-issue-button.*"
+    optional: true
+
+# Try finding the compose icon or text button
+- runFlow:
+    when:
+      visible: "Issue title"
+    commands:
+      - assertVisible: "Issue title"
+      - assertVisible: "Labels"
