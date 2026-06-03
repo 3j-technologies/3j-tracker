@@ -37,6 +37,12 @@
     --color-info: var(--info);
     --color-brand: var(--brand);
     --color-brand-foreground: var(--brand-foreground);
+    --color-brand-hover: var(--brand-hover);
+    --color-brand-active: var(--brand-active);
+    --color-brand-panel: var(--brand-panel);
+    --color-brand-panel-fg: var(--brand-panel-fg);
+    --color-brand-panel-muted: var(--brand-panel-muted);
+    --color-brand-panel-faint: var(--brand-panel-faint);
     --color-accent-foreground: var(--accent-foreground);
     --color-accent: var(--accent);
     --color-muted-foreground: var(--muted-foreground);
@@ -96,6 +102,16 @@
     /* — Brand accent: amber-orange, 10% rule — rare but unmissable */
     --brand: oklch(0.72 0.18 48);
     --brand-foreground: oklch(0.985 0 0);
+    /* Brand interaction states — button hover/active */
+    --brand-hover: oklch(0.68 0.18 48);
+    --brand-active: oklch(0.64 0.18 48);
+
+    /* — Brand panel: the dark split-panel on the login screen. Stays a deep
+       ink ground in both themes; warm-tinted fg + two subdued tiers. */
+    --brand-panel: oklch(0.20 0.018 52);
+    --brand-panel-fg: oklch(0.94 0.006 62);
+    --brand-panel-muted: oklch(0.64 0.014 56);
+    --brand-panel-faint: oklch(0.44 0.010 52);
 
     /* — Status colors */
     --success: oklch(0.52 0.15 152);
@@ -164,6 +180,12 @@
     /* — Brand: slightly brighter on dark */
     --brand: oklch(0.78 0.18 48);
     --brand-foreground: oklch(0.14 0.012 52);
+    /* Brand interaction states — track the brighter dark brand */
+    --brand-hover: oklch(0.74 0.18 48);
+    --brand-active: oklch(0.70 0.18 48);
+
+    /* Brand panel stays the same ink ground on dark (login left panel
+       is always dark); fg/tiers inherit the :root values. */
 
     /* — Status */
     --success: oklch(0.65 0.15 152);

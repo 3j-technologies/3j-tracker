@@ -12,7 +12,7 @@ const buttonVariants = cva(
       variant: {
         // Primary: brand amber — one key action per view, never sprinkle
         default:
-          "bg-brand text-brand-foreground shadow-[0_1px_2px_oklch(0_0_0/0.15)] hover:bg-[oklch(0.68_0.18_48)] active:bg-[oklch(0.64_0.18_48)]",
+          "bg-brand text-brand-foreground shadow-[0_1px_2px_oklch(0_0_0/0.15)] hover:bg-brand-hover active:bg-brand-active",
         // Outline: secondary actions — border, no fill
         outline:
           "border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground aria-expanded:bg-accent dark:border-input dark:bg-input/20 dark:hover:bg-input/40",

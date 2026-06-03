@@ -2,14 +2,6 @@
 
 import { useState, useEffect, useCallback, useRef, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@multica/ui/components/ui/card";
 import { Input } from "@multica/ui/components/ui/input";
 import { Button } from "@multica/ui/components/ui/button";
 import { Label } from "@multica/ui/components/ui/label";
@@ -408,20 +400,15 @@ export function LoginPage({
 
   return (
     <div className="flex min-h-svh">
-      {/* Left panel: full-height brand mark — asymmetric layout, not centered blob */}
-      <div
-        className="hidden lg:flex lg:w-[420px] xl:w-[480px] shrink-0 flex-col justify-between p-10"
-        style={{
-          background: "oklch(0.20 0.018 52)",
-          color: "oklch(0.94 0.006 62)",
-        }}
-      >
+      {/* Left panel: full-height brand mark — asymmetric layout, not centered blob.
+          The copy below is fixed brand/product identity (wordmark, tagline,
+          tenant tag), not translatable UI strings — so the i18n literal-string
+          rule is intentionally disabled for just this block. */}
+      {/* eslint-disable i18next/no-literal-string */}
+      <div className="hidden lg:flex lg:w-[420px] xl:w-[480px] shrink-0 flex-col justify-between bg-brand-panel p-10 text-brand-panel-fg">
         {/* Top: wordmark */}
         <div className="flex items-center gap-2">
-          <span
-            className="text-xs font-medium tracking-[0.12em] uppercase"
-            style={{ color: "oklch(0.72 0.18 48)" }}
-          >
+          <span className="text-xs font-medium tracking-[0.12em] uppercase text-brand">
             3J Tracker
           </span>
         </div>
@@ -434,23 +421,25 @@ export function LoginPage({
           >
             Track work.<br />Ship faster.
           </p>
-          <p className="mt-4 text-sm leading-relaxed" style={{ color: "oklch(0.64 0.014 56)" }}>
+          <p className="mt-4 text-sm leading-relaxed text-brand-panel-muted">
             Tickets, board, dashboard — no plugin tax. Yours.
           </p>
         </div>
 
         {/* Bottom: version / tenant tag */}
-        <p className="text-[11px] tracking-wide" style={{ color: "oklch(0.44 0.010 52)" }}>
+        <p className="text-[11px] tracking-wide text-brand-panel-faint">
           3J Technologies · Self-hosted
         </p>
       </div>
+      {/* eslint-enable i18next/no-literal-string */}
 
       {/* Right panel: the actual form, left-aligned not centered */}
       <div className="flex flex-1 flex-col justify-center px-8 py-12 sm:px-12 lg:px-16 xl:px-20">
         <div className="w-full max-w-[360px]">
-          {/* Mobile-only wordmark */}
+          {/* Mobile-only wordmark — fixed brand identity, not translatable */}
           <div className="mb-8 flex items-center gap-2 lg:hidden">
             {logo}
+            {/* eslint-disable-next-line i18next/no-literal-string */}
             <span className="text-xs font-medium tracking-[0.12em] uppercase text-muted-foreground">3J Tracker</span>
           </div>
 
