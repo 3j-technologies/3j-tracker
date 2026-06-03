@@ -1,0 +1,34 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Flow: launch → login → verify OTP → land on issues/inbox
+# Requires env vars:
+#   TEST_EMAIL   - account email (has access to a workspace)
+#   TEST_OTP     - 6-digit OTP (use a fixed-OTP test account)
+#   APP_BUNDLE_ID - optional override (defaults to dev bundle id)
+
+- launchApp:
+    clearState: true
+
+# Must see sign-in screen
+- assertVisible: "Sign in to 3J Tracker"
+- assertVisible: "Send code"
+
+# Enter email
+- tapOn:
+    id: ".*"
+    text: "you@example.com"
+    optional: false
+- inputText: ${TEST_EMAIL}
+
+- tapOn: "Send code"
+
+# OTP verify screen
+- assertVisible: "Enter verification code"
+
+# Enter the 6-digit OTP digit by digit via the OTP input
+- inputText: ${TEST_OTP}
+
+# After verify succeeds, we land on the workspace or issues screen
+# Wait up to 10s for navigation
+- waitForAnimationToEnd:
+    timeout: 10000

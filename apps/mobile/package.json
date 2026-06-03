@@ -1,5 +1,5 @@
 {
-  "name": "@multica/mobile",
+  "name": "@3j-tracker/mobile",
   "version": "0.1.0",
   "private": true,
   "main": "expo-router/entry",
@@ -15,8 +15,12 @@
     "ios:device:staging:release": "dotenv -e .env.staging -- cross-env APP_ENV=staging expo run:ios --device --configuration Release",
     "ios:device:prod": "dotenv -e .env.production -- cross-env APP_ENV=production expo run:ios --device",
     "ios:device:prod:release": "dotenv -e .env.production -- cross-env APP_ENV=production expo run:ios --device --configuration Release",
+    "android": "expo run:android",
+    "android:staging": "dotenv -e .env.staging -- cross-env APP_ENV=staging expo run:android",
+    "android:prod": "dotenv -e .env.production -- cross-env APP_ENV=production expo run:android",
     "lint": "expo lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "e2e": "~/.maestro/bin/maestro test .maestro/e2e-smoke.yaml"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",

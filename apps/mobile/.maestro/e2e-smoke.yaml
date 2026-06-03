@@ -1,0 +1,103 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Smoke E2E: launch → login → issues list → open issue detail
+# Run with:
+#   ~/.maestro/bin/maestro test apps/mobile/.maestro/e2e-smoke.yaml \
+#     -e APP_BUNDLE_ID=app.tracker.x3jtech.dev \
+#     -e TEST_EMAIL=test@3jtech.app \
+#     -e TEST_OTP=123456
+#
+# Requirements:
+#   - Android emulator running (Pixel_5 preferred)
+#   - Dev client installed: pnpm run android (builds + installs APK)
+#   - Metro running: pnpm run dev --port 8085
+#   - Local backend running with TRACKER_DEV_VERIFICATION_CODE=123456
+#     and adb reverse tcp:8085 tcp:8085 + adb reverse tcp:8090 tcp:8090
+#   - TEST_EMAIL account must belong to at least one workspace with issues
+
+# ── Launch ───────────────────────────────────────────────────────────────────
+- launchApp:
+    clearState: true
+
+# ── Dev client: select the 3J Tracker server ─────────────────────────────────
+# The dev client shows available Metro servers. Tap the 3J Tracker one.
+- tapOn:
+    text: "http://10.0.2.2:8085"
+
+# Wait for JS bundle to load and login screen to appear
+- waitForAnimationToEnd:
+    timeout: 30000
+
+# Dismiss Expo dev-menu welcome "Continue" if present (first launch only)
+- runFlow:
+    when:
+      visible:
+        text: "Continue"
+    commands:
+      - tapOn:
+          text: "Continue"
+      - waitForAnimationToEnd:
+          timeout: 3000
+
+# Dismiss dev tools sheet if it opened (gear button area misfire)
+- runFlow:
+    when:
+      visible: "Toggle performance monitor"
+    commands:
+      - pressKey: Back
+      - waitForAnimationToEnd:
+          timeout: 2000
+
+# ── Auth: login screen ───────────────────────────────────────────────────────
+- assertVisible: "Sign in to 3J Tracker"
+- assertVisible: "Send code"
+
+- tapOn:
+    text: "you@example.com"
+- inputText: ${TEST_EMAIL}
+
+- tapOn: "Send code"
+
+# ── Auth: OTP verify screen ──────────────────────────────────────────────────
+- assertVisible: "Enter verification code"
+
+# Enter OTP - inputText works with the OTP component when pasted as a single string
+- inputText: ${TEST_OTP}
+
+# Wait for navigation post-verify (workspace selection or direct to inbox)
+- waitForAnimationToEnd:
+    timeout: 15000
+
+# ── Workspace selection (if shown) ───────────────────────────────────────────
+- runFlow:
+    when:
+      visible: "Select a workspace"
+    commands:
+      - tapOn: "3J Technologies"
+      - waitForAnimationToEnd:
+          timeout: 8000
+
+# Extra wait for workspace + tab bar to render
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# ── My Issues list ───────────────────────────────────────────────────────────
+# Navigate to My Issues tab
+- tapOn:
+    text: "My Issues"
+
+# Scope selector must be visible
+- assertVisible: "Assigned"
+- assertVisible: "Created"
+
+# Switch to Created scope to see test issues
+- tapOn: "Created"
+
+# ── Issue detail ─────────────────────────────────────────────────────────────
+# Tap the first issue row (testID prefix = "issue-row-")
+- tapOn:
+    id: "issue-row-.*"
+    index: 0
+
+# Detail screen — activity section header is the reliable sentinel
+- assertVisible: "ACTIVITY"

@@ -17,35 +17,37 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   return {
     ...config,
     name: isProd
-      ? "Multica"
+      ? "3J Tracker"
       : isStaging
-        ? "Multica (Staging)"
-        : "Multica (Dev)",
-    slug: "multica-mobile",
+        ? "3J Tracker (Staging)"
+        : "3J Tracker (Dev)",
+    slug: "3j-tracker-mobile",
     version: "0.1.0",
     orientation: "portrait",
     userInterfaceStyle: "automatic",
-    scheme: "multica",
+    scheme: "3jtracker",
     // 1024x1024 source shared with the desktop client
     // (apps/desktop/build/icon.png). Expo prebuild generates every required
     // iOS icon size from this single PNG.
     icon: "./assets/icon.png",
     ios: {
       supportsTablet: false,
-      // Per-variant bundle id overrides exist for one reason: an Apple ID
-      // can only sign bundle prefixes it owns, so contributors not on the
-      // Multica Apple Developer team (and external users self-building a
-      // personal copy against production) need to swap to a reverse-domain
-      // they control. Each variant has its own `_<VARIANT>` suffix and is
-      // only read inside that variant's branch — a generic
-      // `EXPO_BUNDLE_IDENTIFIER` would leak across variants (Expo CLI
-      // auto-loads `.env.<mode>.local` regardless of APP_ENV) and collapse
-      // dev / staging / prod onto a single id.
       bundleIdentifier: isProd
-        ? (process.env.EXPO_BUNDLE_IDENTIFIER_PROD ?? "ai.multica.mobile")
+        ? (process.env.EXPO_BUNDLE_IDENTIFIER_PROD ?? "app.3jtech.tracker")
         : isStaging
-          ? "ai.multica.mobile.staging"
-          : (process.env.EXPO_BUNDLE_IDENTIFIER_DEV ?? "ai.multica.mobile.dev"),
+          ? "app.3jtech.tracker.staging"
+          : (process.env.EXPO_BUNDLE_IDENTIFIER_DEV ?? "app.3jtech.tracker.dev"),
+    },
+    android: {
+      package: isProd
+        ? (process.env.EXPO_ANDROID_PACKAGE_PROD ?? "app.tracker.x3jtech")
+        : isStaging
+          ? "app.tracker.x3jtech.staging"
+          : (process.env.EXPO_ANDROID_PACKAGE_DEV ?? "app.tracker.x3jtech.dev"),
+      adaptiveIcon: {
+        foregroundImage: "./assets/icon.png",
+        backgroundColor: "#f5a623",
+      },
     },
     plugins: [
       "expo-router",
@@ -60,7 +62,7 @@ export default ({ config }: ConfigContext): ExpoConfig => {
           // iOS 14+. Camera + microphone are disabled — we only ever read
           // from the existing photo library.
           photosPermission:
-            "Allow Multica to access your photos to attach images to issues and comments.",
+            "Allow 3J Tracker to access your photos to attach images to issues and comments.",
           cameraPermission: false,
           microphonePermission: false,
         },
