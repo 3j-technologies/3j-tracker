@@ -75,6 +75,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: "Pinned", icon: "pin", path: "/more/pins" },
   { label: "Issues", icon: "list.bullet", path: "/more/issues" },
+  { label: "Board", icon: "square.grid.2x2", path: "/board" },
   { label: "Projects", icon: "square.stack", path: "/more/projects" },
 ];
 
