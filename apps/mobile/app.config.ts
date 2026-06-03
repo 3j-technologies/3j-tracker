@@ -48,6 +48,10 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         foregroundImage: "./assets/icon.png",
         backgroundColor: "#f5a623",
       },
+      // RECORD_AUDIO is required for voice-note recording (expo-av).
+      // Declaring it here ensures every `expo prebuild` generates it in
+      // AndroidManifest.xml durably — no manual manifest editing needed.
+      permissions: ["android.permission.RECORD_AUDIO"],
     },
     plugins: [
       "expo-router",
@@ -59,12 +63,19 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         {
           // iOS NSPhotoLibraryUsageDescription. Without this string in
           // Info.plist, calling launchImageLibraryAsync hard-crashes on
-          // iOS 14+. Camera + microphone are disabled — we only ever read
-          // from the existing photo library.
+          // iOS 14+. Camera is disabled — we only ever read from the
+          // existing photo library.
+          //
+          // NOTE: microphonePermission is intentionally NOT set to false
+          // here. Setting it to false causes expo-image-picker to emit
+          // tools:node="remove" for RECORD_AUDIO in AndroidManifest.xml,
+          // which blocks expo-av from recording voice notes (the manifest
+          // merge "remove" directive wins over any "add"). Omitting the
+          // option leaves RECORD_AUDIO to expo-av's config plugin
+          // (android.permissions below is belt-and-suspenders).
           photosPermission:
             "Allow 3J Tracker to access your photos to attach images to issues and comments.",
           cameraPermission: false,
-          microphonePermission: false,
         },
       ],
       [
@@ -95,6 +106,15 @@ export default ({ config }: ConfigContext): ExpoConfig => {
         },
       ],
     ],
-    extra: { APP_ENV: env },
+    extra: {
+      APP_ENV: env,
+      // TODO(infra/Mohit): run `eas init` (needs Expo account login) and wire
+      // the resulting projectId here so Expo push tokens resolve correctly on
+      // real devices:
+      //
+      //   eas: { projectId: "<uuid-from-eas-init>" },
+      //
+      // Until this is done, push-token acquisition will fail silently on device.
+    },
   };
 };
