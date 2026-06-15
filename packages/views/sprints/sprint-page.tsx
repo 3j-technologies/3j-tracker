@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   Plus, Play, CheckCircle2, Archive, ChevronDown, ChevronRight,
-  BarChart2, TrendingDown, Calendar, Target, ArrowLeft, MoreHorizontal, X,
+  BarChart2, TrendingDown, Target, X,
 } from "lucide-react";
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid,
@@ -21,7 +21,6 @@ import {
   projectVelocityOptions,
   sprintBurndownOptions,
   useCreateSprint,
-  useUpdateSprint,
   useStartSprint,
   useCompleteSprint,
   useAddTicketToSprint,
@@ -33,7 +32,6 @@ import { Badge } from "@multica/ui/components/ui/badge";
 import { Input } from "@multica/ui/components/ui/input";
 import { Textarea } from "@multica/ui/components/ui/textarea";
 import { Skeleton } from "@multica/ui/components/ui/skeleton";
-import { Separator } from "@multica/ui/components/ui/separator";
 import { cn } from "@multica/ui/lib/utils";
 import { BreadcrumbHeader } from "../layout/breadcrumb-header";
 import {
@@ -44,19 +42,13 @@ import {
   DialogFooter,
 } from "@multica/ui/components/ui/dialog";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@multica/ui/components/ui/dropdown-menu";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@multica/ui/components/ui/select";
-import { api } from "@multica/core/api";
+import { useT } from "../i18n";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -79,14 +71,27 @@ function statusLabel(status: string) {
   return status.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-function sprintStateBadge(state: Sprint["state"]) {
+function SprintStateBadge({ state }: { state: Sprint["state"] }) {
+  const { t } = useT("sprints");
   switch (state) {
     case "active":
-      return <Badge variant="default" className="bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30">Active</Badge>;
+      return (
+        <Badge variant="default" className="bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30">
+          {t(($) => $.badge.active)}
+        </Badge>
+      );
     case "completed":
-      return <Badge variant="default" className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">Completed</Badge>;
+      return (
+        <Badge variant="default" className="bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
+          {t(($) => $.badge.completed)}
+        </Badge>
+      );
     default:
-      return <Badge variant="outline" className="text-muted-foreground">Planning</Badge>;
+      return (
+        <Badge variant="outline" className="text-muted-foreground">
+          {t(($) => $.badge.planning)}
+        </Badge>
+      );
   }
 }
 
@@ -145,6 +150,7 @@ function CreateSprintDialog({
   projectId: string;
   wsId: string;
 }) {
+  const { t } = useT("sprints");
   const [name, setName] = useState("");
   const [goal, setGoal] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -163,11 +169,11 @@ function CreateSprintDialog({
       },
       {
         onSuccess: () => {
-          toast.success("Sprint created");
+          toast.success(t(($) => $.create_dialog.success));
           onOpenChange(false);
           setName(""); setGoal(""); setStartDate(""); setEndDate("");
         },
-        onError: () => toast.error("Failed to create sprint"),
+        onError: () => toast.error(t(($) => $.create_dialog.error)),
       },
     );
   }
@@ -176,13 +182,13 @@ function CreateSprintDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Create Sprint</DialogTitle>
+          <DialogTitle>{t(($) => $.create_dialog.title)}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">Name</label>
+            <label className="text-sm font-medium">{t(($) => $.create_dialog.name_label)}</label>
             <Input
-              placeholder="Sprint 1"
+              placeholder={t(($) => $.create_dialog.name_placeholder)}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -190,9 +196,12 @@ function CreateSprintDialog({
             />
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-muted-foreground">Goal <span className="font-normal">(optional)</span></label>
+            <label className="text-sm font-medium text-muted-foreground">
+              {t(($) => $.create_dialog.goal_label)}{" "}
+              <span className="font-normal">{t(($) => $.create_dialog.goal_optional)}</span>
+            </label>
             <Textarea
-              placeholder="What do you want to achieve?"
+              placeholder={t(($) => $.create_dialog.goal_placeholder)}
               value={goal}
               onChange={(e) => setGoal(e.target.value)}
               rows={2}
@@ -201,18 +210,26 @@ function CreateSprintDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-muted-foreground">Start date</label>
+              <label className="text-sm font-medium text-muted-foreground">
+                {t(($) => $.create_dialog.start_date_label)}
+              </label>
               <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-muted-foreground">End date</label>
+              <label className="text-sm font-medium text-muted-foreground">
+                {t(($) => $.create_dialog.end_date_label)}
+              </label>
               <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              {t(($) => $.create_dialog.cancel)}
+            </Button>
             <Button type="submit" disabled={!name.trim() || createSprint.isPending}>
-              {createSprint.isPending ? "Creating..." : "Create Sprint"}
+              {createSprint.isPending
+                ? t(($) => $.create_dialog.submitting)
+                : t(($) => $.create_dialog.submit)}
             </Button>
           </DialogFooter>
         </form>
@@ -238,6 +255,7 @@ function CompleteSprintDialog({
   wsId: string;
   projectId: string;
 }) {
+  const { t } = useT("sprints");
   const [carryTo, setCarryTo] = useState("backlog");
   const completeSprint = useCompleteSprint(wsId, projectId);
 
@@ -245,8 +263,11 @@ function CompleteSprintDialog({
     completeSprint.mutate(
       { sprintId: sprint.id, data: { carry_to: carryTo } },
       {
-        onSuccess: () => { toast.success("Sprint completed"); onOpenChange(false); },
-        onError: () => toast.error("Failed to complete sprint"),
+        onSuccess: () => {
+          toast.success(t(($) => $.complete_dialog.success));
+          onOpenChange(false);
+        },
+        onError: () => toast.error(t(($) => $.complete_dialog.error)),
       },
     );
   }
@@ -259,20 +280,22 @@ function CompleteSprintDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-sm">
         <DialogHeader>
-          <DialogTitle>Complete Sprint</DialogTitle>
+          <DialogTitle>{t(($) => $.complete_dialog.title)}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Incomplete tickets will be moved to the selected destination.
+            {t(($) => $.complete_dialog.incomplete_description)}
           </p>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">Move incomplete tickets to</label>
-            <Select value={carryTo} onValueChange={setCarryTo}>
+            <label className="text-sm font-medium">
+              {t(($) => $.complete_dialog.move_label)}
+            </label>
+            <Select value={carryTo} onValueChange={(v) => { if (v !== null) setCarryTo(v); }}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="backlog">Backlog</SelectItem>
+                <SelectItem value="backlog">{t(($) => $.complete_dialog.backlog_option)}</SelectItem>
                 {planningOrActive.map((s) => (
                   <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                 ))}
@@ -281,9 +304,13 @@ function CompleteSprintDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            {t(($) => $.complete_dialog.cancel)}
+          </Button>
           <Button onClick={handleComplete} disabled={completeSprint.isPending}>
-            {completeSprint.isPending ? "Completing..." : "Complete Sprint"}
+            {completeSprint.isPending
+              ? t(($) => $.complete_dialog.submitting)
+              : t(($) => $.complete_dialog.submit)}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -304,6 +331,7 @@ function SprintCard({
   wsId: string;
   projectId: string;
 }) {
+  const { t } = useT("sprints");
   const [expanded, setExpanded] = useState(sprint.state === "active");
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
   const { data: issues = [], isLoading } = useQuery({
@@ -333,7 +361,7 @@ function SprintCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-medium text-sm">{sprint.name}</span>
-            {sprintStateBadge(sprint.state)}
+            <SprintStateBadge state={sprint.state} />
           </div>
           {sprint.goal && (
             <p className="text-xs text-muted-foreground mt-0.5 truncate">{sprint.goal}</p>
@@ -343,7 +371,9 @@ function SprintCard({
         {/* Stats */}
         <div className="hidden sm:flex items-center gap-4 shrink-0 mr-2">
           {totalPoints > 0 && (
-            <span className="text-xs text-muted-foreground">{totalPoints} pts</span>
+            <span className="text-xs text-muted-foreground">
+              {t(($) => $.sprint_card_pts, { count: totalPoints })}
+            </span>
           )}
           {totalCount > 0 && (
             <span className="text-xs text-muted-foreground">
@@ -368,13 +398,15 @@ function SprintCard({
               disabled={startSprint.isPending}
               onClick={() =>
                 startSprint.mutate(sprint.id, {
-                  onSuccess: () => toast.success("Sprint started"),
-                  onError: (err) => toast.error(err instanceof Error ? err.message : "Failed to start sprint"),
+                  onSuccess: () => toast.success(t(($) => $.sprint_card.started_success)),
+                  onError: (err) => toast.error(
+                    err instanceof Error ? err.message : t(($) => $.sprint_card.start_error),
+                  ),
                 })
               }
             >
               <Play className="h-3 w-3 mr-1" />
-              Start
+              {t(($) => $.sprint_card.start)}
             </Button>
           )}
           {sprint.state === "active" && (
@@ -385,7 +417,7 @@ function SprintCard({
               onClick={() => setCompleteDialogOpen(true)}
             >
               <CheckCircle2 className="h-3 w-3 mr-1" />
-              Complete
+              {t(($) => $.sprint_card.complete)}
             </Button>
           )}
         </div>
@@ -412,9 +444,9 @@ function SprintCard({
             </div>
           ) : issues.length === 0 ? (
             <div className="py-6 text-center text-sm text-muted-foreground">
-              No tickets in this sprint.
+              {t(($) => $.sprint_card.no_tickets)}
               {sprint.state !== "completed" && backlog.length > 0 && (
-                <p className="mt-1 text-xs">Drag tickets from the backlog below.</p>
+                <p className="mt-1 text-xs">{t(($) => $.sprint_card.drag_hint)}</p>
               )}
             </div>
           ) : (
@@ -426,9 +458,9 @@ function SprintCard({
                   action={sprint.state !== "completed" ? () =>
                     removeTicket.mutate(
                       { sprintId: sprint.id, ticketId: issue.id },
-                      { onError: () => toast.error("Failed to remove ticket") },
+                      { onError: () => toast.error(t(($) => $.sprint_card.remove_error)) },
                     ) : undefined}
-                  actionLabel="Remove from sprint"
+                  actionLabel={t(($) => $.sprint_card.remove_from_sprint)}
                   actionIcon={<X className="h-3 w-3 text-muted-foreground" />}
                 />
               ))}
@@ -438,7 +470,9 @@ function SprintCard({
           {/* Add from backlog */}
           {sprint.state !== "completed" && backlog.length > 0 && (
             <div className="mt-2">
-              <p className="px-3 text-xs text-muted-foreground mb-1">Add from backlog:</p>
+              <p className="px-3 text-xs text-muted-foreground mb-1">
+                {t(($) => $.sprint_card.add_from_backlog)}
+              </p>
               <div className="max-h-36 overflow-y-auto divide-y divide-border/50">
                 {backlog.slice(0, 10).map((issue) => (
                   <IssueRow
@@ -447,10 +481,10 @@ function SprintCard({
                     action={() =>
                       addTicket.mutate(
                         { sprintId: sprint.id, ticketId: issue.id },
-                        { onError: () => toast.error("Failed to add ticket") },
+                        { onError: () => toast.error(t(($) => $.sprint_card.add_error)) },
                       )
                     }
-                    actionLabel="Add to sprint"
+                    actionLabel={t(($) => $.sprint_card.add_to_sprint)}
                     actionIcon={<Plus className="h-3 w-3 text-muted-foreground" />}
                   />
                 ))}
@@ -483,6 +517,7 @@ function BacklogSection({
   projectId: string;
   activeSprints: Sprint[];
 }) {
+  const { t } = useT("sprints");
   const [expanded, setExpanded] = useState(true);
   const { data: backlog = [], isLoading } = useQuery(backlogOptions(wsId, projectId));
   const addTicket = useAddTicketToSprint(wsId, projectId);
@@ -500,7 +535,7 @@ function BacklogSection({
           {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </button>
         <div className="flex-1">
-          <span className="font-medium text-sm">Backlog</span>
+          <span className="font-medium text-sm">{t(($) => $.backlog.title)}</span>
           <span className="ml-2 text-xs text-muted-foreground">({backlog.length})</span>
         </div>
       </div>
@@ -513,7 +548,7 @@ function BacklogSection({
             </div>
           ) : backlog.length === 0 ? (
             <div className="py-6 text-center text-sm text-muted-foreground">
-              No unsprinted tickets. All tickets are assigned to sprints.
+              {t(($) => $.backlog.empty)}
             </div>
           ) : (
             <div className="mt-1 divide-y divide-border/50">
@@ -524,9 +559,9 @@ function BacklogSection({
                   action={hasActiveSprint && activeSprint ? () =>
                     addTicket.mutate(
                       { sprintId: activeSprint.id, ticketId: issue.id },
-                      { onError: () => toast.error("Failed to add ticket to sprint") },
+                      { onError: () => toast.error(t(($) => $.backlog.add_error)) },
                     ) : undefined}
-                  actionLabel="Add to active sprint"
+                  actionLabel={t(($) => $.backlog.add_to_active)}
                   actionIcon={<Plus className="h-3 w-3 text-muted-foreground" />}
                 />
               ))}
@@ -541,6 +576,7 @@ function BacklogSection({
 // ─── Velocity Chart ──────────────────────────────────────────────────────────
 
 function VelocityChart({ projectId, wsId }: { projectId: string; wsId: string }) {
+  const { t } = useT("sprints");
   const { data: velocityData = [] } = useQuery(projectVelocityOptions(wsId, projectId));
 
   const chartData = velocityData.map((v) => ({
@@ -552,7 +588,7 @@ function VelocityChart({ projectId, wsId }: { projectId: string; wsId: string })
   if (chartData.length === 0) {
     return (
       <div className="flex items-center justify-center h-48 text-sm text-muted-foreground">
-        No completed sprints yet.
+        {t(($) => $.charts.velocity_no_data)}
       </div>
     );
   }
@@ -568,8 +604,8 @@ function VelocityChart({ projectId, wsId }: { projectId: string; wsId: string })
           labelClassName="font-medium"
         />
         <Legend wrapperStyle={{ fontSize: 12 }} />
-        <Bar dataKey="completed" name="Completed pts" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
-        <Bar dataKey="total" name="Total pts" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="completed" name={t(($) => $.charts.velocity_completed_pts)} fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
+        <Bar dataKey="total" name={t(($) => $.charts.velocity_total_pts)} fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
   );
@@ -578,6 +614,7 @@ function VelocityChart({ projectId, wsId }: { projectId: string; wsId: string })
 // ─── Burndown Chart ──────────────────────────────────────────────────────────
 
 function BurndownChart({ sprintId, sprint, wsId }: { sprintId: string; sprint: Sprint; wsId: string }) {
+  const { t } = useT("sprints");
   const { data: burndownIssues = [] } = useQuery(sprintBurndownOptions(wsId, sprintId));
 
   // Build daily burndown from sprint start to end
@@ -595,7 +632,6 @@ function BurndownChart({ sprintId, sprint, wsId }: { sprintId: string; sprint: S
       const dayDate = new Date(start.getTime() + d * 86400000);
       const dateStr = dayDate.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 
-      // Count remaining = total - done issues updated before this day
       const completedByThisDay = burndownIssues
         .filter(
           (i) =>
@@ -616,7 +652,7 @@ function BurndownChart({ sprintId, sprint, wsId }: { sprintId: string; sprint: S
   if (chartData.length === 0) {
     return (
       <div className="flex items-center justify-center h-48 text-sm text-muted-foreground">
-        Set sprint start/end dates to see the burndown.
+        {t(($) => $.charts.burndown_no_dates)}
       </div>
     );
   }
@@ -632,7 +668,7 @@ function BurndownChart({ sprintId, sprint, wsId }: { sprintId: string; sprint: S
         <Line
           type="monotone"
           dataKey="remaining"
-          name="Remaining"
+          name={t(($) => $.charts.burndown_remaining)}
           stroke="hsl(var(--chart-1))"
           strokeWidth={2}
           dot={false}
@@ -640,7 +676,7 @@ function BurndownChart({ sprintId, sprint, wsId }: { sprintId: string; sprint: S
         <Line
           type="monotone"
           dataKey="ideal"
-          name="Ideal"
+          name={t(($) => $.charts.burndown_ideal)}
           stroke="hsl(var(--chart-2))"
           strokeWidth={2}
           strokeDasharray="4 4"
@@ -662,6 +698,7 @@ function ChartsSection({
   projectId: string;
   activeSprint: Sprint | undefined;
 }) {
+  const { t } = useT("sprints");
   const [activeTab, setActiveTab] = useState<"velocity" | "burndown">("velocity");
 
   return (
@@ -678,7 +715,7 @@ function ChartsSection({
           )}
         >
           <BarChart2 className="h-3.5 w-3.5" />
-          Velocity
+          {t(($) => $.charts.velocity_tab)}
         </button>
         <button
           type="button"
@@ -691,24 +728,28 @@ function ChartsSection({
           )}
         >
           <TrendingDown className="h-3.5 w-3.5" />
-          Burndown
+          {t(($) => $.charts.burndown_tab)}
         </button>
       </div>
 
       <div className="p-4">
         {activeTab === "velocity" ? (
           <>
-            <p className="text-xs text-muted-foreground mb-3">Completed vs. total story points per sprint</p>
+            <p className="text-xs text-muted-foreground mb-3">
+              {t(($) => $.charts.velocity_description)}
+            </p>
             <VelocityChart projectId={projectId} wsId={wsId} />
           </>
         ) : activeSprint ? (
           <>
-            <p className="text-xs text-muted-foreground mb-3">Remaining work for active sprint</p>
+            <p className="text-xs text-muted-foreground mb-3">
+              {t(($) => $.charts.burndown_description)}
+            </p>
             <BurndownChart sprintId={activeSprint.id} sprint={activeSprint} wsId={wsId} />
           </>
         ) : (
           <div className="flex items-center justify-center h-48 text-sm text-muted-foreground">
-            No active sprint. Start a sprint to see the burndown chart.
+            {t(($) => $.charts.burndown_no_active)}
           </div>
         )}
       </div>
@@ -719,6 +760,7 @@ function ChartsSection({
 // ─── Main Page ───────────────────────────────────────────────────────────────
 
 export function SprintsPage({ projectId }: { projectId: string }) {
+  const { t } = useT("sprints");
   const wsId = useWorkspaceId();
   const wsPaths = useWorkspacePaths();
   const router = useNavigation();
@@ -729,6 +771,9 @@ export function SprintsPage({ projectId }: { projectId: string }) {
   const activeSprint = sprints.find((s) => s.state === "active");
   const planningSprints = sprints.filter((s) => s.state === "planning");
   const completedSprints = sprints.filter((s) => s.state === "completed");
+
+  // router is used to allow future navigation (back button etc.)
+  void router;
 
   if (isLoading) {
     return (
@@ -746,12 +791,12 @@ export function SprintsPage({ projectId }: { projectId: string }) {
   return (
     <div className="flex flex-col h-full">
       <BreadcrumbHeader
-        segments={[{ href: wsPaths.projects(), label: "Projects" }]}
-        leaf={<span className="font-medium">Sprints</span>}
+        segments={[{ href: wsPaths.projects(), label: t(($) => $.page.breadcrumb_projects) }]}
+        leaf={<span className="font-medium">{t(($) => $.page.breadcrumb_sprints)}</span>}
         actions={
           <Button size="sm" onClick={() => setCreateDialogOpen(true)}>
             <Plus className="h-3.5 w-3.5 mr-1.5" />
-            <span className="hidden sm:inline">New Sprint</span>
+            <span className="hidden sm:inline">{t(($) => $.page.new_sprint)}</span>
           </Button>
         }
       />
@@ -764,7 +809,7 @@ export function SprintsPage({ projectId }: { projectId: string }) {
             <section>
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-blue-500 inline-block" />
-                Active Sprint
+                {t(($) => $.page.section_active)}
               </h2>
               <SprintCard
                 sprint={activeSprint}
@@ -779,7 +824,7 @@ export function SprintsPage({ projectId }: { projectId: string }) {
           {planningSprints.length > 0 && (
             <section>
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                Planning
+                {t(($) => $.page.section_planning)}
               </h2>
               <div className="space-y-3">
                 {planningSprints.map((s) => (
@@ -792,7 +837,7 @@ export function SprintsPage({ projectId }: { projectId: string }) {
           {/* Backlog */}
           <section>
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-              Backlog
+              {t(($) => $.page.section_backlog)}
             </h2>
             <BacklogSection wsId={wsId} projectId={projectId} activeSprints={sprints} />
           </section>
@@ -800,7 +845,7 @@ export function SprintsPage({ projectId }: { projectId: string }) {
           {/* Charts */}
           <section>
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-              Analytics
+              {t(($) => $.page.section_analytics)}
             </h2>
             <ChartsSection wsId={wsId} projectId={projectId} activeSprint={activeSprint} />
           </section>
@@ -810,7 +855,7 @@ export function SprintsPage({ projectId }: { projectId: string }) {
             <section>
               <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
                 <Archive className="h-3.5 w-3.5" />
-                Completed ({completedSprints.length})
+                {t(($) => $.page.section_completed)} ({completedSprints.length})
               </h2>
               <div className="space-y-2">
                 {completedSprints.map((s) => (
@@ -824,13 +869,13 @@ export function SprintsPage({ projectId }: { projectId: string }) {
           {sprints.length === 0 && (
             <div className="text-center py-20">
               <Target className="h-12 w-12 text-muted-foreground/40 mx-auto mb-4" />
-              <h3 className="text-sm font-medium mb-1">No sprints yet</h3>
+              <h3 className="text-sm font-medium mb-1">{t(($) => $.page.empty_title)}</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Create your first sprint to start planning and tracking work.
+                {t(($) => $.page.empty_description)}
               </p>
               <Button onClick={() => setCreateDialogOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
-                Create Sprint
+                {t(($) => $.page.create_first)}
               </Button>
             </div>
           )}

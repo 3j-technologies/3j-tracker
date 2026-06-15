@@ -1,0 +1,79 @@
+{
+  "badge": {
+    "active": "Active",
+    "completed": "Completed",
+    "planning": "Planning"
+  },
+  "create_dialog": {
+    "title": "Create Sprint",
+    "name_label": "Name",
+    "name_placeholder": "Sprint 1",
+    "goal_label": "Goal",
+    "goal_optional": "(optional)",
+    "goal_placeholder": "What do you want to achieve?",
+    "start_date_label": "Start date",
+    "end_date_label": "End date",
+    "cancel": "Cancel",
+    "submit": "Create Sprint",
+    "submitting": "Creating...",
+    "success": "Sprint created",
+    "error": "Failed to create sprint"
+  },
+  "complete_dialog": {
+    "title": "Complete Sprint",
+    "incomplete_description": "Incomplete tickets will be moved to the selected destination.",
+    "move_label": "Move incomplete tickets to",
+    "backlog_option": "Backlog",
+    "cancel": "Cancel",
+    "submit": "Complete Sprint",
+    "submitting": "Completing...",
+    "success": "Sprint completed",
+    "error": "Failed to complete sprint"
+  },
+  "sprint_card": {
+    "start": "Start",
+    "complete": "Complete",
+    "no_tickets": "No tickets in this sprint.",
+    "drag_hint": "Drag tickets from the backlog below.",
+    "add_from_backlog": "Add from backlog:",
+    "remove_from_sprint": "Remove from sprint",
+    "add_to_sprint": "Add to sprint",
+    "started_success": "Sprint started",
+    "start_error": "Failed to start sprint",
+    "remove_error": "Failed to remove ticket",
+    "add_error": "Failed to add ticket"
+  },
+  "backlog": {
+    "title": "Backlog",
+    "empty": "No unsprinted tickets. All tickets are assigned to sprints.",
+    "add_to_active": "Add to active sprint",
+    "add_error": "Failed to add ticket to sprint"
+  },
+  "sprint_card_pts": "{{count}} pts",
+  "charts": {
+    "velocity_tab": "Velocity",
+    "burndown_tab": "Burndown",
+    "velocity_description": "Completed vs. total story points per sprint",
+    "burndown_description": "Remaining work for active sprint",
+    "velocity_no_data": "No completed sprints yet.",
+    "burndown_no_dates": "Set sprint start/end dates to see the burndown.",
+    "burndown_no_active": "No active sprint. Start a sprint to see the burndown chart.",
+    "velocity_completed_pts": "Completed pts",
+    "velocity_total_pts": "Total pts",
+    "burndown_remaining": "Remaining",
+    "burndown_ideal": "Ideal"
+  },
+  "page": {
+    "breadcrumb_projects": "Projects",
+    "breadcrumb_sprints": "Sprints",
+    "new_sprint": "New Sprint",
+    "section_active": "Active Sprint",
+    "section_planning": "Planning",
+    "section_backlog": "Backlog",
+    "section_analytics": "Analytics",
+    "section_completed": "Completed",
+    "empty_title": "No sprints yet",
+    "empty_description": "Create your first sprint to start planning and tracking work.",
+    "create_first": "Create Sprint"
+  }
+}

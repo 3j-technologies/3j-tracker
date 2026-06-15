@@ -64,7 +64,9 @@
     "no_issues_yet": "イシューはまだありません",
     "toast_link_copied": "リンクをコピーしました",
     "toast_project_deleted": "プロジェクトを削除しました",
-    "toast_move_issue_failed": "イシューを移動できませんでした"
+    "toast_move_issue_failed": "イシューを移動できませんでした",
+    "sprints_button": "Sprints",
+    "sprints_tooltip": "Sprints & Backlog"
   },
   "resources": {
     "section_header": "リソース",

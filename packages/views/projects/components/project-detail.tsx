@@ -725,11 +725,11 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
                       onClick={() => router.push(wsPaths.projectSprints(projectId))}
                     >
                       <Zap className="h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">Sprints</span>
+                      <span className="hidden sm:inline">{t(($) => $.detail.sprints_button)}</span>
                     </Button>
                   }
                 />
-                <TooltipContent side="bottom">Sprints &amp; Backlog</TooltipContent>
+                <TooltipContent side="bottom">{t(($) => $.detail.sprints_tooltip)}</TooltipContent>
               </Tooltip>
               <Button
                 variant="ghost"
